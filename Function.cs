@@ -14,6 +14,11 @@ public class Function : IHttpFunction
   private readonly ILogger _logger;
   private readonly StorageClient _storageClient;
   private const string BucketName = "received-data";
+  private const string IndexHtmlPath = "index.html";
+
+  private static string _cachedHtmlContent;
+  private static DateTime _lastModifiedTime = DateTime.MinValue;
+  private static readonly object _cacheLock = new object();
 
   public Function(ILogger<Function> logger)
   {
@@ -30,6 +35,13 @@ public class Function : IHttpFunction
           request.ContentType.Contains("application/octet-stream"))
       {
         await HandleBinaryUploadAsync(context);
+        return;
+      }
+
+      // For GET requests, serve the index.html file
+      if (request.Method == "GET")
+      {
+        await ServeIndexHtmlAsync(context);
         return;
       }
 
@@ -58,6 +70,51 @@ public class Function : IHttpFunction
       }
 
       await context.Response.WriteAsync($"Hello {name}!");
+    }
+
+    private async Task ServeIndexHtmlAsync(HttpContext context)
+    {
+      try
+      {
+        string htmlContent = await GetCachedHtmlContentAsync();
+
+        context.Response.ContentType = "text/html";
+        context.Response.StatusCode = 200;
+        await context.Response.WriteAsync(htmlContent);
+      }
+      catch (Exception ex)
+      {
+        _logger.LogError(ex, "Error serving index.html");
+        context.Response.StatusCode = 500;
+        await context.Response.WriteAsync("Error loading page");
+      }
+    }
+
+    private async Task<string> GetCachedHtmlContentAsync()
+    {
+      if (!File.Exists(IndexHtmlPath))
+      {
+        throw new FileNotFoundException($"File not found: {IndexHtmlPath}");
+      }
+
+      var currentModifiedTime = File.GetLastWriteTimeUtc(IndexHtmlPath);
+
+      lock (_cacheLock)
+      {
+        // Check if we need to reload the file
+        if (_cachedHtmlContent == null || currentModifiedTime > _lastModifiedTime)
+        {
+          _logger.LogInformation($"Loading index.html (Last modified: {currentModifiedTime})");
+          _cachedHtmlContent = File.ReadAllText(IndexHtmlPath);
+          _lastModifiedTime = currentModifiedTime;
+        }
+        else
+        {
+          _logger.LogInformation("Returning cached index.html content");
+        }
+
+        return _cachedHtmlContent;
+      }
     }
 
     private async Task HandleBinaryUploadAsync(HttpContext context)
