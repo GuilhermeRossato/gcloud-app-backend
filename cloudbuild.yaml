@@ -1,0 +1,21 @@
+steps:
+  # Deploy to Cloud Functions (Gen 2) - uses cloud-provided server
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
+    entrypoint: gcloud
+    args:
+      - "functions"
+      - "deploy"
+      - "gcloud-app-backend"
+      - "--gen2"
+      - "--runtime=dotnet8"
+      - "--region=southamerica-east1"
+      - "--source=."
+      - "--entry-point=HelloHttp.Function"
+      - "--trigger-http"
+      - "--allow-unauthenticated"
+      - "--memory=512MB"
+      - "--timeout=60s"
+    id: "deploy-cloud-function"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
