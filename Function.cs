@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace HelloHttp;
 
+
 public class Function : IHttpFunction
 {
   private readonly ILogger _logger;
