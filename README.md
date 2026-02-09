@@ -1,4 +1,4 @@
-To compile and run `Function.cs` locally and have it listen on port 8080, you can use the .NET CLI. Assuming `Function.cs` is part of a .NET project, follow these steps:
+To compile and run `Main.cs` locally and have it listen on port 8080, you can use the .NET CLI. Assuming `Main.cs` is part of a .NET project, follow these steps:
 
 1. **Ensure the .NET SDK is installed**:
   Make sure you have the .NET SDK installed. You can verify this by running:
@@ -20,16 +20,16 @@ To compile and run `Function.cs` locally and have it listen on port 8080, you ca
 4. **Verify the application is running**:
   Open a browser or use a tool like `curl` to access `http://localhost:8080` and verify the application is responding.
 
-If `Function.cs` is not part of a project, you can create a new project and add the file:
+If `Main.cs` is not part of a project, you can create a new project and add the file:
 
 1. **Create a new project**:
   ```bash
-  dotnet new web -o MyFunctionApp
-  cd MyFunctionApp
+  dotnet new web -o MyMainApp
+  cd MyMainApp
   ```
 
-2. **Add `Function.cs` to the project**:
-  Place `Function.cs` in the project directory and ensure it is included in the `.csproj` file.
+2. **Add `Main.cs` to the project**:
+  Place `Main.cs` in the project directory and ensure it is included in the `.csproj` file.
 
 3. **Run the application**:
   ```bash

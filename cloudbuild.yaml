@@ -10,7 +10,7 @@ steps:
       - "--runtime=dotnet8"
       - "--region=southamerica-east1"
       - "--source=."
-      - "--entry-point=HelloHttp.Function"
+      - "--entry-point=HelloHttp.Main"
       - "--trigger-http"
       - "--allow-unauthenticated"
       - "--memory=512MB"

@@ -10,16 +10,26 @@ using System.Threading.Tasks;
 
 namespace HelloHttp;
 
-public class Function : IHttpFunction
+public class Main : IHttpFunction
 {
   private readonly ILogger _logger;
   private readonly StorageClient _storageClient;
+  private readonly int _port; // Local variable for the port
   private const string BucketName = "received-data";
 
-  public Function(ILogger<Function> logger)
+  public Main(ILogger<Main> logger)
   {
     _logger = logger;
     _storageClient = StorageClient.Create();
+
+    // Read PORT environment variable
+    string portEnv = Environment.GetEnvironmentVariable("PORT");
+    if (string.IsNullOrWhiteSpace(portEnv) || portEnv == "0" || !int.TryParse(portEnv, out _port))
+    {
+      _port = 8080; // Fallback to default port
+    }
+    _logger.LogInformation($"Server will listen on port {_port}");
+
     SetupServer();
   }
 
@@ -28,9 +38,9 @@ public class Function : IHttpFunction
     try
     {
       HttpListener listener = new HttpListener();
-      listener.Prefixes.Add("http://127.0.0.1:8080/");
+      listener.Prefixes.Add($"http://127.0.0.1:{_port}/");
       listener.Start();
-      _logger.LogInformation("Server started listening on http://127.0.0.1:8080/");
+      _logger.LogInformation($"Server started listening on http://127.0.0.1:{_port}/");
       Task.Run(async () =>
       {
         while (true)
@@ -49,7 +59,7 @@ public class Function : IHttpFunction
     }
     catch (Exception ex)
     {
-      _logger.LogError(ex, "Failed to start server on http://127.0.0.1:8080/");
+      _logger.LogError(ex, $"Failed to start server on http://127.0.0.1:{_port}/");
     }
   }
 
