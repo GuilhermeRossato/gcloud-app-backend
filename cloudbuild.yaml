@@ -15,6 +15,7 @@ steps:
       - "--allow-unauthenticated"
       - "--memory=512MB"
       - "--timeout=60s"
+      - "--port=8080"
     id: "deploy-cloud-function"
 
 options:
