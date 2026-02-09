@@ -13,6 +13,16 @@ if exist obj (
     rmdir /s /q obj
 )
 
+REM Check and remove existing HelloHttp.exe before compilation
+if exist bin\Debug\net8.0\HelloHttp.exe (
+    echo Removing existing HelloHttp.exe...
+    del /q bin\Debug\net8.0\HelloHttp.exe
+    if exist bin\Debug\net8.0\HelloHttp.exe (
+        echo Failed to remove HelloHttp.exe. Exiting with error code 12.
+        exit /b 12
+    )
+)
+
 REM Build the app
 if exist HelloHttp.csproj (
     echo Building the app using dotnet...
@@ -28,11 +38,10 @@ if exist HelloHttp.csproj (
     exit /b
 )
 
-REM Check if the build output exists
-if not exist bin (
-    echo Build output not found. Exiting.
-    pause
-    exit /b
+REM Verify if HelloHttp.exe exists after compilation
+if not exist bin\Debug\net8.0\HelloHttp.exe (
+    echo HelloHttp.exe not found after build. Exiting with error code 1.
+    exit /b 1
 )
 
 REM Run the app
